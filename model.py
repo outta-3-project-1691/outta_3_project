@@ -30,11 +30,14 @@ class segmentation_model(nn.Module):
     def __init__(self, n_class):
         super(segmentation_model, self).__init__()
         # [1] 빈칸을 작성하시오.
+        pass
 
     def _initialize_weights(self):
         # [2] 빈칸을 작성하시오.
+        pass
         
 
     def forward(self, x):
         # [3] 빈칸을 작성하시오.
+        pass
     
