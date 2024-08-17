@@ -1,6 +1,6 @@
-from read_dataset import *
-from preprop import *
-from model import segmentation_model
+from .read_dataset import *
+from .preprop import *
+from .model import segmentation_model
 import torch
 
 def train(img_list, gt_list, model, epoch, learning_rate, optimizer, criterion, data_len):
