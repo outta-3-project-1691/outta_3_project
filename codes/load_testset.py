@@ -28,10 +28,10 @@ def load_testset(file_path, train_len, valid_len, batch_size=32, num_workers=0):
             
             if i < train_len:
                 train_imgs.append(img.unsqueeze(0))  # 차원 추가 후 리스트에 저장
-                train_gts.append(gt.unsqueeze(0))
+                train_gts.append(gt)
             else:
                 valid_imgs.append(img.unsqueeze(0))  # 차원 추가 후 리스트에 저장
-                valid_gts.append(gt.unsqueeze(0))
+                valid_gts.append(gt)
     
     # 리스트를 텐서로 결합
     train_imgs = torch.cat(train_imgs, dim=0)
