@@ -59,7 +59,7 @@ def generate_image(image, mask, prompt, negative_prompt, pipe, seed, device):
 
     # [1] 빈칸을 작성하시오.
     # 이미지 생성: Stable Diffusion 파이프라인을 사용하여 이미지 생성
-    result = pipe(prompt=prompt, negative_prompt=negative_prompt, image=in_image, mask_image=in_mask, generator=generator).images
+    result = pipe(prompt=prompt, negative_prompt=negative_prompt, image=in_image, mask_image=in_mask, generator=generator, guidance_scale = 1, strength = 1).images
     # [2] 빈칸을 작성하시오.
     # 생성된 결과 이미지 중 첫 번째 이미지를 추출
     result = result[0]
