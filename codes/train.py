@@ -1,10 +1,15 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.utils.data import TensorDataset, DataLoader
+import numpy as np
+from tqdm.auto import tqdm
 
 from .read_dataset import *
 from .preprop import *
 from .model import segmentation_model
+
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 class SCLoss(nn.Module):
     def __init__(self):
@@ -24,13 +29,15 @@ class SCLoss(nn.Module):
         loss_y = F.l1_loss(pred_dy, target_dy)
         
         return loss_x + loss_y
+
+
 def epoch_loop(model, criterion, sc_loss, L, optimizer, dataloader, valid=False):
     epoch_loss = 0
 
     model.train()
 
     for inputs, targets in tqdm(dataloader, leave=False):
-        inputs, targets = inputs.to(device=model.device), targets.to(device=model.device)
+        inputs, targets = inputs.to(device=device), targets.to(device=device)
         targets = targets.long()
 
         # Forward pass
@@ -57,17 +64,19 @@ def epoch_loop(model, criterion, sc_loss, L, optimizer, dataloader, valid=False)
 
     return epoch_loss/len(dataloader)
 
+
 def train(img_list, gt_list, model, epoch, learning_rate, optimizer, criterion, data_len):
     # 리스트를 텐서로 결합
     L = 0.5
-    train_imgs = torch.cat(img_list, dim=0)
-    train_gts = torch.cat(gt_list, dim=0)
-
+    sc_loss = SCLoss()
+    train_imgs = torch.tensor(np.array(img_list))
+    train_gts = torch.tensor(np.array(gt_list)).squeeze(1)
+    print()
     # TensorDataset으로 변환
     train_dataset = TensorDataset(train_imgs, train_gts)
     
     # DataLoader 생성
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+    train_loader = DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=0)
   
     model.train()
 
@@ -75,6 +84,3 @@ def train(img_list, gt_list, model, epoch, learning_rate, optimizer, criterion, 
       epoch_loop(model, criterion, sc_loss, L,optimizer, train_loader)
       
       torch.save(model.state_dict(), f'model_state_dict_epoch_{i}.pth')
-    optimizer = Adam(model.parameters(), lr=1e-8)
-
-    train(train_loader, model, epoch, optimizer, criterion)
